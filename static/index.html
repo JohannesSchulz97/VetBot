@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.5.7/css/pico.min.css">-->
+    <title>Vetbot</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .content-box {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            user-select: none; /* Prevent text selection */
+        }
+
+        input, button, textarea {
+            user-select: auto; /* Allow selection in input fields */
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="content-box">
+            <header>
+                <h1>Vetbot</h1>
+                <p>Ask questions and get reliable answers from trusted veterinary sources.</p>
+            </header>
+            <section>
+                <form id="chat-form">
+                    <label for="user-question">Your Question:</label>
+                    <input type="text" id="user-question" placeholder="Type your question..." required>
+                    <button id="submit-button" type="submit">Ask</button>
+                </form>
+                <div id="chat-response" aria-live="polite"></div>
+            </section>
+        </div>
+    </main>
+    <script src="script.js" defer></script>
+</body>
+</html>
