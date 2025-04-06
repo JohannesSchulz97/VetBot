@@ -1,209 +1,141 @@
-"""
-
-import requests
-from bs4 import BeautifulSoup
-
-r = requests.get('https://www.msdvetmanual.com/dog-owners')
-
-soup = BeautifulSoup(r.content, 'html.parser')
-contents = soup.find('div', class_='Section_leftContent__vp_sT')
-links = [a['href'] for a in contents.find_all('a', href=True)]
-
-with open('output.txt', 'w') as file:
-    print(links, file=file)
-"""
-"""
-import requests
-from bs4 import BeautifulSoup
-
-# Fetch the page
-r = requests.get('https://www.msdvetmanual.com/dog-owners')
-
-# Parse the content
-soup = BeautifulSoup(r.content, 'html.parser')
-
-# Find the container
-contents = soup.find('div', class_='Section_leftContent__vp_sT')
-print(contents.prettify())
-
-# Check if contents is found
-if contents:
-    links = [a['href'] for a in contents.find_all('a', href=True)]
-else:
-    links = ["No content found"]
-
-
-
-
-
-# Write to file
-with open('output.txt', 'w') as file:
-    print(links, file=file)
-"""
-
-"""
-import requests
-from bs4 import BeautifulSoup
+import asyncio
 import json
-from tqdm import tqdm
-import time
+from playwright.async_api import async_playwright
 
-BASE_URL = "https://www.merckvetmanual.com"
-START_URL = BASE_URL + "/dog-owners"
-
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
-
-def get_article_links(start_url):
-    res = requests.get(start_url, headers=headers)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    
-    # Find links inside the dog section
-    links = soup.select("a[href^='/dog-owners']")  # all internal dog articles
-    article_links = list({BASE_URL + a['href'] for a in links if a['href'].count("/") > 2})
-    return article_links
-
-def scrape_article(url):
-    res = requests.get(url, headers=headers)
-    soup = BeautifulSoup(res.text, 'html.parser')
-
-    title_tag = soup.find("h1")
-    title = title_tag.text.strip() if title_tag else "Untitled"
-
-    content_div = soup.find("div", class_="content-box") or soup.find("div", id="article-body")
-    paragraphs = content_div.find_all("p") if content_div else []
-    text = "\n".join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
-
-    return {
-        "title": title,
-        "url": url,
-        "content": text
-    }
-
-def main():
-    print("Fetching article links...")
-    links = get_article_links(START_URL)
-    print(f"Found {len(links)} articles.")
-
-    data = []
-    for url in tqdm(links):
-        try:
-            article = scrape_article(url)
-            if len(article["content"]) > 100:  # ignore very short ones
-                data.append(article)
-            time.sleep(1)  # be polite to their servers
-        except Exception as e:
-            print(f"Failed to process {url}: {e}")
-
-    with open("merck_dog_articles.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ Done! Saved {len(data)} articles to merck_dog_articles.json")
-
-if __name__ == "__main__":
-    main()
 """
+    Initializes the browser using Playwright with headless or non-headless mode.
+    Returns the browser context and page object.
+"""
+async def init_browser(headless=True):
+    playwright = await async_playwright().start()
+    browser = await playwright.chromium.launch(headless=headless)
+    context = await browser.new_context(viewport={"width": 1200, "height": 800})
+    page = await context.new_page()
+    return playwright, browser, page
 
+"""
+    Tries to accept the cookie banner if it exists on the page.
+    Prevents interference with future button clicks.
+"""
+async def accept_cookies(page):
+    try:
+        await page.click("#onetrust-accept-btn-handler", timeout=5000)
+        print("Accepted cookies.")
+        await page.wait_for_timeout(1000)
+    except Exception as e:
+        print("No cookie banner found or could not click it:", e)
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-import time
-import os
+"""
+    Finds all collapsed sections and expands them by clicking.
+    Only clicks buttons with class names containing 'SectionDataComponent' or 'AccordionSectionComponent'.
+"""
+async def expand_all_sections(page, max_rounds=10, headless=False):
+    expanded_count = 0
 
-def init_driver(headless=True):
-    options = Options()
-    if headless:
-        options.add_argument("--headless")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-
-    # Prevent Selenium Manager bug by explicitly passing a working driver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    return driver
-
-
-def expand_all(driver):
-    wait = WebDriverWait(driver, 10)
-    while True:
-        try:
-            plus_buttons = driver.find_elements(By.CSS_SELECTOR, ".icon-plus")
-            if not plus_buttons:
-                print("All sections expanded.")
-                break
-            for btn in plus_buttons:
-                try:
-                    driver.execute_script("arguments[0].click();", btn)
-                    time.sleep(10)
-                except Exception as e:
-                    print(f"Error clicking button: {e}")
+    for round_num in range(max_rounds):
+        print(f"\n🔁 Expansion round {round_num + 1}")
+        buttons = await page.query_selector_all('button[aria-expanded="false"]')
+        clicked_this_round = 0
+        for i, button in enumerate(buttons):
+    
+            try:
+                class_name = await button.get_attribute("class") or ""
+                if "SectionDataComponent" not in class_name and "AccordionSectionComponent" not in class_name:
                     continue
-        except Exception as e:
-            print(f"Error finding buttons: {e}")
+
+                # Scroll into view and click
+                await button.scroll_into_view_if_needed()
+                if headless: 
+                    await button.click()
+                else:
+                    await page.wait_for_timeout(100)
+                    await button.click()
+                    await page.wait_for_timeout(100)
+
+                expanded_count += 1
+                clicked_this_round += 1
+
+            except Exception as e:
+                print(f"⚠️ Could not click button #{i}: {e}")
+                continue
+            if expanded_count > 10:
+                await page.wait_for_timeout(1000)
+                return
+
+        if clicked_this_round == 0:
+            print("✅ No more buttons to expand.")
             break
 
+    print(f"\n✅ Finished. Expanded {expanded_count} sections total.")
 
-def get_article_links(driver):
-    toc_url = "https://www.merckvetmanual.com/dog-owners"
-    driver.get(toc_url)
-    expand_all(driver)
-    time.sleep(2)
+async def find_urls(page):
+    """
+        Finds all article links on the page and returns a list of unique URLs.
+        Filters out links containing "/all-".
+    """
+    links = await page.query_selector_all("#mainContainer a[href*='/']")
+    hrefs = set([await link.get_attribute("href") for link in links if "/all-" not in await link.get_attribute("href")])
+    return list(hrefs)
 
-    # After expansion, get all links to actual articles
-    links = driver.find_elements(By.CSS_SELECTOR, "#toc a[href*='/']")
-    hrefs = list(set(link.get_attribute("href") for link in links if "/all-" not in link.get_attribute("href")))
-    return hrefs
-
-
-def scrape_article(driver, url):
-    driver.get(url)
-    time.sleep(1.5)
-
+async def scrape_article(page, url):
+    """
+        Scrapes the title and content of an article from the given URL.
+        Returns a dictionary with 'name', 'link', and 'content'.
+    """
     try:
-        title_elem = driver.find_element(By.TAG_NAME, "h1")
-        content_elem = driver.find_element(By.CSS_SELECTOR, ".content-section")
-        title = title_elem.text.strip()
-        content = content_elem.text.strip()
-        return {"url": url, "title": title, "content": content}
+        await page.goto(url)
+        await page.wait_for_timeout(1500)  # Wait for the page to load
+
+        # Extract the title
+        title_element = await page.query_selector("h1")
+        title = await title_element.inner_text() if title_element else "Untitled"
+
+        # Extract the content
+        content_element = await page.query_selector(".content-section")
+        content = await content_element.inner_text() if content_element else "No content available"
+
+        return {
+            "name": title.strip(),
+            "link": url,
+            "content": content.strip()
+        }
     except Exception as e:
-        print(f"Failed to scrape {url}: {e}")
+        print(f"⚠️ Failed to scrape {url}: {e}")
         return None
 
+async def save_to_json(data, filename="articles.json"):
+    """
+        Saves a list of articles to a JSON file.
+    """
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"✅ Saved {len(data)} articles to {filename}")
 
-def main():
-    driver = init_driver(headless=False)
+"""
+    Main function to launch browser, navigate to site, and run actions.
+"""
+async def main():
+    playwright, browser, page = await init_browser(headless=False)
+    await page.goto("https://www.merckvetmanual.com/dog-owners")
+    await page.wait_for_timeout(2000)
+
+    await accept_cookies(page)
+    await expand_all_sections(page, headless=False)
+    urls = await find_urls(page)
+    print(f"Found {len(urls)} articles")
+
     articles = []
+    for i, url in enumerate(urls):
+        print(f"Scraping article {i + 1}/{len(urls)}: {url}")
+        article = await scrape_article(page, url)
+        if article and len(article["content"]) > 100:  # Ignore very short articles
+            articles.append(article)
 
-    try:
-        print("Getting article links...")
-        links = get_article_links(driver)
-        print(f"Found {len(links)} articles")
+    await save_to_json(articles, filename="merck_articles.json")
 
-        for i, link in enumerate(links):
-            print(f"Scraping {i+1}/{len(links)}: {link}")
-            data = scrape_article(driver, link)
-            if data:
-                articles.append(data)
-
-    finally:
-        driver.quit()
-
-    # Save to local file
-    os.makedirs("data", exist_ok=True)
-    with open("data/merck_articles.txt", "w", encoding="utf-8") as f:
-        for article in articles:
-            f.write(f"{article['title']}\n{article['url']}\n{article['content']}\n{'='*80}\n")
-
-    print("Scraping complete. Articles saved to data/merck_articles.txt")
-
+    input("\nPress Enter to close the browser...")
+    await browser.close()
+    await playwright.stop()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
