@@ -1,14 +1,5 @@
-# AI for Animal Care
 
-
-The era of large language models (LLMs) began in 2017 with the publication of *"Attention Is All You Need"* by Vaswani et al. [[1]](https://arxiv.org/abs/1706.03762). This groundbreaking paper introduced the transformer architecture, laying the foundation for a revolution in how machines process and generate human language. Since then, LLMs and generative AI more generally have rapidly evolved, powering applications that range from conversational agents to code generation and medical question answering.
-
-Yet, despite their remarkable capabilities, generative models  are still underutilized across many sectors. Industry adoption often lags behind research advancements, and public awareness of their true potential remains limited. However, the landscape is changing fast — particularly as LLMs are increasingly integrated into intelligent agents, opening up transformative real-world applications.
-
-One such opportunity was the **5-Day Generative AI Workshop** hosted by **Kaggle and Google**, which introduced participants to modern generative AI techniques. As part of the capstone project, I chose to build a **veterinary assistant chatbot**, powered by *Retrieval-Augmented Generation (RAG)* and grounded in authoritative content from the **Merck Veterinary Manual**.
-
-
-## Why Veterinary Science?
+## Motivation
 
 Veterinary medicine — particularly in low-resource and rural regions — remains one of the fields where LLMs can make a significant impact. Access to up-to-date veterinary knowledge is often limited, and qualified professionals may be scarce. 
 Therefore, many pet owners dont really understand their animals needs. 
@@ -19,14 +10,15 @@ Animal welfare suffers as a result, with growing street dog populations, prevent
 A well-designed, AI-powered assistant that provides **reliable, verifiable, and scientifically grounded veterinary information** could support animal caretakers and educate the public about their animals. This could particularly make a difference when it comes to large street dog populations. Often poorly understood and feared they face hostility from locals and grow up in an environment of competition for and scarcity of food.
 Additionally, most of these street dogs are not spayed or neutered, leading to uncontrolled population growth, increased hunger, disease transmission, and aggression.
 
-In this article, we will explore how LLMs, paired with smart retrieval techniques, can serve as reliable, accessible veterinary assistants — even in low-resource environments.
+In this project, I therefore chose to build a veterinary assistant chatbot, powered by Retrieval-Augmented Generation (RAG) and grounded in authoritative content from the Merck Veterinary Manual.
 
 
 ## What This Project Covers
 
-We will start to explore the process of retrieving the Merck Veterinary articles through Web Crawling and Scraping. 
-Given the dataset, the next step involves the creation of a vector store ([**Chroma**](https://docs.trychroma.com/docs/overview/introduction)), which stores the different articles as vector embeddings that represent their meaning and content. 
-After that, we will look at the creation of the chatbot, based on the [**Gemini API**](https://ai.google.dev/api?lang=python), that uses the vector store to answer users questions, based on the article content. This involves a combination of **Prompt Engineering** and the retrieval of relevant articles (see figure).
+The authoritative content used in this project was retrieved by scraping the Merck Veterinary Manual. 
+For more details, please visit the respective [GitHub Repository](https://github.com/JohannesSchulz97/WebScraper).
+Given the dataset, the first step towards a functioning chatbot involves the creation of a vector store ([**Chroma**](https://docs.trychroma.com/docs/overview/introduction)), which stores the different articles as vector embeddings that represent their meaning and content. 
+The chatbot implementation is for the moment based on the [**Gemini API**](https://ai.google.dev/api?lang=python), that uses the vector store to answer users questions, based on the article content. This involves a combination of **Prompt Engineering** and the retrieval of relevant articles (see figure).
 
 
 <figure>
