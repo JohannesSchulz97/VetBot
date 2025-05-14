@@ -12,6 +12,8 @@ Additionally, most of these street dogs are not spayed or neutered, leading to u
 
 In this project, I therefore chose to build a veterinary assistant chatbot, powered by Retrieval-Augmented Generation (RAG) and grounded in authoritative content from the Merck Veterinary Manual.
 
+## Instructions
+
 
 ## What This Project Covers
 
