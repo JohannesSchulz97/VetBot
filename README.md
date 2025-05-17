@@ -3,19 +3,34 @@
 
 Veterinary medicine — particularly in low-resource and rural regions — remains one of the fields where LLMs can make a significant impact. Access to up-to-date veterinary knowledge is often limited, and qualified professionals may be scarce. 
 Therefore, many pet owners dont really understand their animals needs. 
-They feed the wrong, sometimes harmful food, keep their dogs locked in cages the whole day and dont react appropropriately in times of medical emergence with potentially devastating consequences. 
+They feed the wrong, sometimes harmful food, keep their dogs locked in cages the whole day and dont react appropropriately in times of medical emergency with potentially devastating consequences. 
 Additionally, behavioral training often happens violently and the importance of vaccinations, sterilization and disease prevention are not understood.
 Animal welfare suffers as a result, with growing street dog populations, preventable diseases, and misinformation contributing to systemic challenges.
 
-A well-designed, AI-powered assistant that provides **reliable, verifiable, and scientifically grounded veterinary information** could support animal caretakers and educate the public about their animals. This could particularly make a difference when it comes to large street dog populations. Often poorly understood and feared they face hostility from locals and grow up in an environment of competition for and scarcity of food.
-Additionally, most of these street dogs are not spayed or neutered, leading to uncontrolled population growth, increased hunger, disease transmission, and aggression.
+A well-designed, AI-powered assistant that provides **reliable, verifiable, and scientifically grounded veterinary information** could support animal caretakers and educate the public about their animals. 
+This documentation explains how setup and use **VetBot**, a veterinary assistant chatbot, powered by Retrieval-Augmented Generation (RAG) and grounded in authoritative content from the Merck Veterinary Manual.
 
-In this project, I therefore chose to build a veterinary assistant chatbot, powered by Retrieval-Augmented Generation (RAG) and grounded in authoritative content from the Merck Veterinary Manual.
+## Instructions & Setup
+After having cloned or downloaded this repository, it is good practice to setup a virtual environment in which all required dependencies can be installed. 
+I will explain how this can be done with `conda`, but there are alternative options such as `pip` and `uv`.
 
-## Instructions
+The easiest way to setup the environment is to make use of the `environment.yml` file:  
+
+```bash
+conda env create -f environment.yml
+```
+
+This creates a conda virtual environment called `vetbot` that contains all required packages.
+To activate this environment use: 
+
+```bash
+conda activate vetbot
+```
+
+At the moment the chatbot can only be accessed through the `vetbot.ipynb` notebook. Open this notebook (for example in VSCode or JupterLab) and run all cells. Now you will see a chatbot UI through which you can chat with the veterinary assistant.
 
 
-## What This Project Covers
+# Implementation Details
 
 The authoritative content used in this project was retrieved by scraping the Merck Veterinary Manual. 
 For more details, please visit the respective [GitHub Repository](https://github.com/JohannesSchulz97/WebScraper).
@@ -29,8 +44,6 @@ The chatbot implementation is for the moment based on the [**Gemini API**](https
     Retrieval Augmented Generation paired with Prompt Engineering can ground LLM output in authoritative content (<a href="https://blog.ml6.eu/leveraging-llms-on-your-domain-specific-knowledge-base-4441c8837b47" target="_blank">Source</a>).
   </figcaption>
 </figure>
-
-Finally, we quickly go through the User Interface, showcasing how it is designed to be both smoothly functioning as well as pleasant to work with and look at.
 
 ## Embedding the dataset in a Chroma database
 
