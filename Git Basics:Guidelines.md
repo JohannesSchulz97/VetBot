@@ -5,12 +5,29 @@
 3. now the changes need to be commited with `git commit -m 'commit message'`
 4. Create a remote repository on GitHub
 5. Now, push your existing repository: 
-```
+
+```bash
 git remote add origin git@github.com:username/new_repo
 git push -u origin master
 ```
 
 ### Branching Basics
 Some important commands in this context:
+
 - `git branch` shows a list of all branches, as well as the currently active branch.
-- To create a new branch use 
+- To create a new branch use `git branch new-branch-name`.
+- To change the active branch use `git switch branch-name`
+
+### Commits and Restoring Files
+
+To restore a file use to a previous version use:
+
+```bash
+git restore --source=<commit> path/to/file
+```
+
+To restore it to the version in a different branch use:
+
+```bash
+git restore --source=branch path/to/file
+```
