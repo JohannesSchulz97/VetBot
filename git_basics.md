@@ -17,8 +17,10 @@ Some important commands in this context:
 - `git branch` shows a list of all branches, as well as the currently active branch.
 - To create a new branch use `git branch new-branch-name`.
 - To change the active branch use `git switch branch-name`
+- to merge the currently active branch with another one (lets say `hotfix`), use `git merge issue02`. If the two branches have not diverged, the merge becomes a simple fast forward, i.e. the branch pointer of main is moved to the same commit as `hotfix`.
+- once a branch is no longer needed it can be deleted with `git branch -d hotfix`
 
-### Commits and Restoring Files
+### Restoring Files
 
 To restore a file use to a previous version use:
 
